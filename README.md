@@ -1,1 +1,4 @@
-# AspNetCoreB2cLogout
+# ASP.NET Core Logout
+
+# Links
+
