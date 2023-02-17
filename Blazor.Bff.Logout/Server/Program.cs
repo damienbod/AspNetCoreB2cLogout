@@ -30,9 +30,6 @@ services.AddAntiforgery(options =>
 services.AddHttpClient();
 services.AddOptions();
 
-//var scopes = Configuration.GetValue<string>("DownstreamApi:Scopes");
-//string[] initialScopes = scopes.Split(' ');
-
 services.AddMicrosoftIdentityWebAppAuthentication(configuration, "AzureB2C")
     .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
     .AddInMemoryTokenCaches();
