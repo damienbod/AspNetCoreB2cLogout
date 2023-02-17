@@ -4,25 +4,15 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Blazor.Bff.Logout.Server;
 
-public class CookieEventHandler : CookieAuthenticationEvents
+public static class CookieEventHandler //: CookieAuthenticationEvents
 {
-    private readonly ILogger<CookieEventHandler> _logger;
-
-    public CookieEventHandler(ILoggerFactory loggerFactory)
-    {
-        _logger = loggerFactory.CreateLogger<CookieEventHandler>();
-    }
-
-    public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
+    public static async Task SlidingExpirationAsync(CookieSlidingExpirationContext context)
     {
         if (context.Principal!.Identity!.IsAuthenticated)
         {
-            _logger.LogInformation("BC ValidatePrincipal: {IsAuthenticated}", 
-                context.Principal.Identity.IsAuthenticated);
-
-            if (false)
+            if (context.ElapsedTime > TimeSpan.FromMinutes(3))
             {
-                context.RejectPrincipal();
+                // TODO fix for js calls
                 await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await context.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
             }
