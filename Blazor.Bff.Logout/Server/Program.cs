@@ -43,6 +43,9 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     sessionOptions => {
         sessionOptions.Events.OnCheckSlidingExpiration 
             = CookieEventHandler.SlidingExpirationAsync;
+
+        //sessionOptions.Events.OnValidatePrincipal
+        //    = CookieEventHandler.ValidatePrincipalAsync;
     })
     .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
     .AddInMemoryTokenCaches();;
