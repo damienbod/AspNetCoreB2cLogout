@@ -40,4 +40,15 @@ public class AccountController : ControllerBase
             CookieAuthenticationDefaults.AuthenticationScheme,
             OpenIdConnectDefaults.AuthenticationScheme);
     }
+
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    [HttpGet("LogoutTimeout")]
+    public IActionResult LogoutTimeout()
+    {
+        return SignOut(
+            new AuthenticationProperties { RedirectUri = "/" },
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            OpenIdConnectDefaults.AuthenticationScheme);
+    }
 }

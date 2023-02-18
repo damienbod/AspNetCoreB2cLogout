@@ -37,18 +37,12 @@ services.AddOptions();
 //    .AddInMemoryTokenCaches();
 
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(authOptions => {
-        configuration.Bind("AzureB2C", authOptions);
-    }, 
-    sessionOptions => {
-        sessionOptions.Events.OnCheckSlidingExpiration 
-            = CookieEventHandler.SlidingExpirationAsync;
-
-        //sessionOptions.Events.OnValidatePrincipal
-        //    = CookieEventHandler.ValidatePrincipalAsync;
+    .AddMicrosoftIdentityWebApp(authOptions => { configuration.Bind("AzureB2C", authOptions);}, 
+    sessionOptions => { 
+        sessionOptions.Events.OnCheckSlidingExpiration  = CookieEventHandler.SlidingExpirationAsync;
     })
     .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
-    .AddInMemoryTokenCaches();;
+    .AddInMemoryTokenCaches();
 
 services.AddControllersWithViews(options =>
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));

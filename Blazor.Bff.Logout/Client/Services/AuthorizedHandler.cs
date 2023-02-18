@@ -32,6 +32,11 @@ public class AuthorizedHandler : DelegatingHandler
         {
             var content = await responseMessage.Content.ReadAsStringAsync();
 
+            if (content != null && content.Contains("sessiontimeout")) // CAE
+            {
+                _authenticationStateProvider.Logout();
+            }
+
             // if server returned 401 Unauthorized, redirect to login page
             if (content != null && content.Contains("acr")) // CAE
             {

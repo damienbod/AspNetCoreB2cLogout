@@ -11,10 +11,12 @@ namespace Blazor.Bff.Logout.Server.Controllers;
 public class DirectApiController : ControllerBase
 {
     [HttpGet]
-    public IEnumerable<string> Get()
+    public IActionResult Get()
     {
         var getClaim = User.Claims.FirstOrDefault(c => c.Type== "sessiontimeout");
 
-        return new List<string> { "some data", "more data", "loads of data" };
+        if (getClaim != null) return Unauthorized("sessiontimeout");
+
+        return Ok(new List<string> { "some data", "more data", "loads of data" });
     }
 }
