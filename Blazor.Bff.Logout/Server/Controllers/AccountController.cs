@@ -41,8 +41,7 @@ public class AccountController : ControllerBase
             OpenIdConnectDefaults.AuthenticationScheme);
     }
 
-    [ValidateAntiForgeryToken]
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("LogoutTimeout")]
     public IActionResult LogoutTimeout()
     {
