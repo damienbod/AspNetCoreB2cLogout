@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 
 namespace Blazor.Bff.Logout.Server;
 
-public static class CookieEventHandler //: CookieAuthenticationEvents
+public static class CookieEventHandler
 {
     public static async Task SlidingExpirationAsync(CookieSlidingExpirationContext context)
     {
