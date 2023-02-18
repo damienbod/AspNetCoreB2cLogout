@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,13 +37,16 @@ services.AddOptions();
 //    .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
 //    .AddInMemoryTokenCaches();
 
+builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(authOptions => { configuration.Bind("AzureB2C", authOptions);}, 
-    sessionOptions => { 
-        sessionOptions.Events.OnCheckSlidingExpiration  = CookieEventHandler.SlidingExpirationAsync;
+    .AddMicrosoftIdentityWebApp(authOptions => { configuration.Bind("AzureB2C", authOptions); },
+    sessionOptions =>
+    {
+        sessionOptions.Events.OnCheckSlidingExpiration = CookieEventHandler.SlidingExpirationAsync;
     })
     .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
-    .AddInMemoryTokenCaches();
+    .AddDistributedTokenCaches();
 
 services.AddControllersWithViews(options =>
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
@@ -57,6 +61,8 @@ services.AddRazorPages().AddMvcOptions(options =>
 
 var app = builder.Build();
 applicationServices = app.Services;
+
+IdentityModelEventSource.ShowPII = true;
 
 if (env.IsDevelopment())
 {
