@@ -1,4 +1,4 @@
-# ASP.NET Core Logout
+# ASP.NET Core Session Timeout Razor Pages with Azure AD B2C
 
 # Links
 
