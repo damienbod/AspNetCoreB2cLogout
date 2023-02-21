@@ -10,6 +10,5 @@ public class IndexModel : PageModel
         var getClaim = User.Claims.FirstOrDefault(c => c.Type == "sessiontimeout");
 
         return Page();
-      
     }
 }
