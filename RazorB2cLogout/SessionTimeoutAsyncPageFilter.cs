@@ -28,7 +28,7 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
         var claimTypes = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
         var name = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == claimTypes)!.Value;
 
-        if(name == null) throw new ArgumentNullException(nameof(name));
+        if (name == null) throw new ArgumentNullException(nameof(name));
 
         var lastActivity = GetFromCache(name);
 
