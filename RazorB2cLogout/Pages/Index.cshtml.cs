@@ -7,7 +7,7 @@ public class IndexModel : PageModel
 {
     public IActionResult OnGet()
     {
-        var getClaim = User.Claims.FirstOrDefault(c => c.Type == "sessiontimeout");
+        var claims = User.Claims.ToList();
 
         return Page();
     }

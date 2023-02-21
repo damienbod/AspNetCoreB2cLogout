@@ -2,12 +2,21 @@
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace RazorB2cLogout;
 
 public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
 {
+    private readonly IDistributedCache _cache;
+    private static readonly object _lock = new();
+    private const int cacheExpirationInDays = 2;
+
+    public SessionTimeoutAsyncPageFilter(IDistributedCache cache)
+    {
+        _cache = cache;
+    }
+
     public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
     {
         return Task.CompletedTask;
@@ -15,14 +24,45 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
 
     public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var getClaim = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "sessiontimeout");
+        var claimTypes = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+        var name = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == claimTypes)!.Value;
 
-        if (getClaim != null)
+        if(name == null) throw new ArgumentNullException(nameof(name));
+
+        var lastActivity = GetFromCache(name);
+
+        if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(3) < DateTime.UtcNow)
         {
             await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await context.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
+        else
+        {
+            AddToCache(name);
+        }
 
         await next.Invoke();
+    }
+
+    private void AddToCache(string name)
+    {
+        var options = new DistributedCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromDays(cacheExpirationInDays));
+
+        lock (_lock)
+        {
+            _cache.SetString(name, DateTime.UtcNow.ToString("s"), options);
+        }
+    }
+
+    private DateTime? GetFromCache(string key)
+    {
+        var item = _cache.GetString(key);
+        if (item != null)
+        {
+            return DateTime.Parse(item);
+        }
+
+        return null;
     }
 }

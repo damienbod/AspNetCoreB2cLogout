@@ -14,11 +14,7 @@ public class Program
         builder.Services.AddDistributedMemoryCache();
 
         builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(authOptions => { builder.Configuration.Bind("AzureAd", authOptions); },
-            sessionOptions =>
-            {
-                sessionOptions.Events.OnCheckSlidingExpiration = CookieEventHandler.SlidingExpirationAsync;
-            })
+            .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd" )
             .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
             .AddDistributedTokenCaches();
 
@@ -27,10 +23,12 @@ public class Program
             options.FallbackPolicy = options.DefaultPolicy;
         });
 
+        builder.Services.AddSingleton<SessionTimeoutAsyncPageFilter>();
+
         builder.Services.AddRazorPages()
         .AddMvcOptions(options =>
         {
-            options.Filters.Add(new SessionTimeoutAsyncPageFilter());
+            options.Filters.Add(typeof(SessionTimeoutAsyncPageFilter));
         })
         .AddMicrosoftIdentityUI();
 
