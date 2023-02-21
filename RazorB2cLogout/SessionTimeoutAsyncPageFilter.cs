@@ -11,6 +11,7 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
     private readonly IDistributedCache _cache;
     private static readonly object _lock = new();
     private const int cacheExpirationInDays = 2;
+    private int timeoutInMinutes = 3;
 
     public SessionTimeoutAsyncPageFilter(IDistributedCache cache)
     {
@@ -31,20 +32,18 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
 
         var lastActivity = GetFromCache(name);
 
-        if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(3) < DateTime.UtcNow)
+        if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(timeoutInMinutes) < DateTime.UtcNow)
         {
             await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await context.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
-        else
-        {
-            AddToCache(name);
-        }
+
+        AddUpdateCache(name);
 
         await next.Invoke();
     }
 
-    private void AddToCache(string name)
+    private void AddUpdateCache(string name)
     {
         var options = new DistributedCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromDays(cacheExpirationInDays));
