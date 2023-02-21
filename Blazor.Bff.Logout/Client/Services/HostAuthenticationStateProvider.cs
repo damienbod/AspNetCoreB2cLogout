@@ -43,7 +43,8 @@ public class HostAuthenticationStateProvider : AuthenticationStateProvider
 
     public void Logout()
     {
-        _navigation.NavigateTo("api/Account/LogoutTimeout", true);
+        var logOutUrl = _navigation.ToAbsoluteUri("api/Account/LogoutTimeout");
+        _navigation.NavigateTo(logOutUrl.ToString(), true);
     }
 
     public void CaeStepUp(string claimsChallenge, string? customReturnUrl = null)

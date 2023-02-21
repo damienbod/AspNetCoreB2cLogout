@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 
@@ -9,9 +10,6 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        //builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        //    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -28,8 +26,13 @@ public class Program
         {
             options.FallbackPolicy = options.DefaultPolicy;
         });
+
         builder.Services.AddRazorPages()
-            .AddMicrosoftIdentityUI();
+        .AddMvcOptions(options =>
+        {
+            options.Filters.Add(new SessionTimeoutAsyncPageFilter());
+        })
+        .AddMicrosoftIdentityUI();
 
         var app = builder.Build();
 
