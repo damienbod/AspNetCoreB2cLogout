@@ -9,8 +9,8 @@ namespace RazorB2cLogout;
 public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
 {
     private readonly IDistributedCache _cache;
-    private const int cacheExpirationInDays = 2;
-    private int timeoutInMinutes = 3;
+    private readonly int _timeoutInMinutes = 3;
+    private const int _cacheExpirationInDays = 2;
 
     public SessionTimeoutAsyncPageFilter(IDistributedCache cache)
     {
@@ -31,7 +31,7 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
 
         var lastActivity = GetFromCache(name);
 
-        if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(timeoutInMinutes) < DateTime.UtcNow)
+        if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(_timeoutInMinutes) < DateTime.UtcNow)
         {
             await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await context.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
@@ -45,7 +45,7 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
     private void AddUpdateCache(string name)
     {
         var options = new DistributedCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromDays(cacheExpirationInDays));
+            .SetSlidingExpiration(TimeSpan.FromDays(_cacheExpirationInDays));
 
         _cache.SetString(name, DateTime.UtcNow.ToString("s"), options);
     }
