@@ -6,7 +6,11 @@ This repository shows how an ASP.NET Core Razor Page application could implement
 
 [ASP.NET Core Session Timeout Razor Pages with Azure AD B2C](https://damienbod.com)
 
-# Links
+## History
+
+2023-05-07 Updated packages
+
+## Links
 
 https://learn.microsoft.com/en-us/azure/active-directory-b2c/openid-connect#send-a-sign-out-request
 
