@@ -8,6 +8,8 @@ This repository shows how an ASP.NET Core Razor Page application could implement
 
 ## History
 
+2023-08-13 Updated packages
+
 2023-05-07 Updated packages
 
 ## Links
