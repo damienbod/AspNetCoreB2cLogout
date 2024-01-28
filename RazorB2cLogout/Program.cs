@@ -13,7 +13,7 @@ public class Program
         builder.Services.AddDistributedMemoryCache();
 
         builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAdB2c" )
+            .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAdB2c")
             .EnableTokenAcquisitionToCallDownstreamApi(Array.Empty<string>())
             .AddDistributedTokenCaches();
 
