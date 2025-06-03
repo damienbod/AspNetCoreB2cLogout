@@ -24,20 +24,24 @@ public class SessionTimeoutAsyncPageFilter : IAsyncPageFilter
 
     public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var claimTypes = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-        var name = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == claimTypes)!.Value;
-
-        if (name == null) throw new ArgumentNullException(nameof(name));
-
-        var lastActivity = GetFromCache(name);
-
-        if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(_timeoutInMinutes) < DateTime.UtcNow)
+        if (context.HttpContext.Request.Path.HasValue 
+            && !context.HttpContext.Request.Path.Value.Contains( "/SignedOut"))
         {
-            await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await context.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-        }
+            var claimTypes = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+            var name = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == claimTypes)!.Value;
 
-        AddUpdateCache(name);
+            if (name == null) throw new ArgumentNullException(nameof(name));
+
+            var lastActivity = GetFromCache(name);
+
+            if (lastActivity != null && lastActivity.GetValueOrDefault().AddMinutes(_timeoutInMinutes) < DateTime.UtcNow)
+            {
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                await context.HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+            }
+
+            AddUpdateCache(name);
+        }
 
         await next.Invoke();
     }
